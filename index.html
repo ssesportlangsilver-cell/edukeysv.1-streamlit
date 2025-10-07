@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+
+<html lang="th">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>KeyPRO v1 • Login → Home → Fullscreen Game</title>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="styles.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet"/></head>
+<body>
+<!-- Topbar (hide on login) -->
+<div class="topbar hidden" id="topbar">
+<div class="brand">
+<div class="logo"></div>
+<div>
+<div style="font-weight:700">EduKeys v3 — เกมฝึกคีย์บอร์ด</div>
+<div class="muted">LUCA WEB •  Login / Home / Game</div>
+</div>
+</div>
+<nav>
+<button class="nav-btn" data-goto="#/home">หน้าบ้าน</button>
+<button class="nav-btn" data-goto="#/results">ผล/รายชื่อ</button>
+<button class="nav-btn primary" data-goto="#/game" id="btnPlayQuick">เริ่มเล่นเกม</button>
+<button class="nav-btn" id="btnLogout">ออกจากระบบ</button>
+</nav>
+</div>
+<!-- LOGIN -->
+<section class="section login-wrap" id="route-login">
+<div class="card">
+<h2 class="h2">🔒 ล็อกอินเข้าใช้งาน</h2>
+<p class="muted">กรอกข้อมูลให้ครบ ระบบจะบันทึกลงรายชื่อและใช้ตั้งชื่อผู้เล่นอัตโนมัติ</p>
+<div class="grid" style="margin-top:10px">
+<div class="field"><label>ชื่อ</label><input id="inFirst" placeholder="เช่น อานันท์"/></div>
+<div class="field"><label>นามสกุล</label><input id="inLast" placeholder="เช่น วัฒนชัย"/></div>
+<div class="field"><label>ชั้น</label><input id="inClass" placeholder="เช่น ม.5/3 หรือ CS101"/></div>
+<div class="field"><label>เลขที่</label><input id="inNo" placeholder="เช่น 12" type="number"/></div>
+</div>
+<div class="row gap">
+<button class="btn primary" id="btnLogin"><i class="fa-solid fa-right-to-bracket"></i> เข้าสู่ระบบ</button>
+<button class="btn" id="btnExportStudentsLogin"><i class="fa-solid fa-download"></i> ส่งออกรายชื่อ (Excel)</button>
+<button class="btn warn" id="btnClearStudentsLogin"><i class="fa-regular fa-trash-can"></i> ลบรายชื่อทั้งหมด</button>
+</div>
+<div class="table-wrap">
+<table>
+<thead><tr><th>ชื่อ-สกุล</th><th>ชั้น</th><th>เลขที่</th><th>เวลา</th></tr></thead>
+<tbody id="tblStudentsLogin"></tbody>
+</table>
+</div>
+</div>
+</section>
+<!-- HOME -->
+<section class="section hidden" id="route-home">
+<div class="home-head">
+<div>
+<div class="welcome">ยินดีต้อนรับ, <strong id="who"></strong></div>
+<div class="muted">กด “เริ่มเล่นเกม” เพื่อเข้าโหมดเต็มหน้าจอ หรือจัดการผล/รายชื่อได้จากเมนู</div>
+</div>
+<div></div>
+</div>
+<div class="home-grid"><div class="col-left"><div class="tile big">
+<div class="title">หน้าต่างห้องเรียน</div>
+<div class="links">
+<a href="#" target="_blank"><i class="fa-regular fa-file-lines"></i><span> วิธีใช้งาน : การวางมือ</span></a>
+<a href="#" target="_blank"><i class="fa-solid fa-circle-play"></i><span> วิดีโอ: เทคนิคมองหน้าจอไม่ก้มคีย์บอร์ด</span></a>
+<a href="#" target="_blank"><i class="fa-solid fa-flask-vial"></i><span> แบบทดสอบก่อนเรียน (Google Forms)</span></a>
+<a href="#" target="_blank"><i class="fa-solid fa-database"></i><span> คลังคำศัพท์คอมพิวเตอร์ (Google Sheets)</span></a>
+</div>
+</div></div><div class="col-right"><div class="tile" id="tileLatest">
+<div class="title">สรุปผลล่าสุด</div>
+<div class="table-scroll"><table>
+<thead><tr><th>เวลา</th><th>ชื่อ</th><th>คะแนน</th><th>Acc</th><th>สถานะ</th></tr></thead>
+<tbody id="tblLatest"></tbody>
+</table></div>
+<div class="row gap">
+<button class="btn" id="btnExportResultsHome"><i class="fa-solid fa-download"></i> ส่งออกผล (Excel)</button>
+<button class="btn warn" id="btnClearResultsHome"><i class="fa-regular fa-trash-can"></i> ลบผลทั้งหมด</button>
+</div>
+</div><div class="tile action"><button class="btn primary" data-goto="#/game"><i class="fa-solid fa-play"></i> เริ่มเล่นเกม</button></div><div class="tile">
+<div class="title">เกณฑ์ผ่านเริ่มต้น</div>
+<div class="grid two">
+<div class="field"><label>คะแนน ≥</label><input id="minScoreHome" value="25"/></div>
+<div class="field"><label>Accuracy ≥ (%)</label><input id="minAccHome" value="85"/></div>
+</div>
+<p class="muted">ค่าดังกล่าวจะใช้เป็นค่าเริ่มต้นในโหมดเกม (แก้ได้ในหน้าเกม)</p>
+</div></div></div>
+</section>
+<!-- FULLSCREEN GAME -->
+<section aria-hidden="true" class="game-wrap hidden" id="route-game">
+<canvas class="canvas" id="game"></canvas>
+<div class="hud" id="hudLeft">
+<div class="chip"><i class="fa-regular fa-clock"></i> เวลา: <strong id="statTime">01:00</strong></div>
+<div class="chip"><i class="fa-solid fa-square-check"></i> คะแนน: <strong id="statScore">0</strong></div>
+<div class="chip"><i class="fa-solid fa-xmark"></i> พลาด: <strong id="statMiss">0</strong></div>
+<div class="chip"><i class="fa-solid fa-bullseye"></i> Accuracy: <strong id="statAcc">100%</strong></div>
+<div class="chip"><i class="fa-regular fa-keyboard"></i> WPM: <strong id="statSpeed">0</strong></div>
+</div>
+<div class="hud-right">
+<button class="nav-btn" id="btnBackHome"><i class="fa-solid fa-house"></i> ออกจากเกม</button>
+<button class="nav-btn" id="btnPause"><i class="fa-solid fa-pause"></i> หยุด</button>
+<button class="nav-btn" id="btnReset"><i class="fa-solid fa-rotate-right"></i> รีเซ็ต</button>
+<button class="nav-btn primary" id="btnStart"><i class="fa-solid fa-play"></i> เริ่ม</button>
+</div>
+<div class="bottom-bar">
+<div class="controls">
+<div class="field"><label>โหมด</label>
+<select class="nav-btn" id="mode"><option value="letters">ตัวอักษรตก</option><option value="words">พิมพ์คำศัพท์</option></select>
+</div>
+<div class="field"><label>ความยาก</label>
+<select class="nav-btn" id="difficulty"><option value="easy">ง่าย</option><option selected="" value="normal">ปกติ</option><option value="hard">ยาก</option></select>
+</div>
+<div class="field"><label>เวลา (วินาที)</label>
+<select class="nav-btn" id="timeLimit"><option>30</option><option selected="">60</option><option>120</option></select>
+</div>
+<div class="field"><label>ชุดคำ (โหมดคำ)</label>
+<select class="nav-btn" id="wordSet"><option selected="" value="basic">พื้นฐาน</option><option value="tech">เทคโนโลยี</option><option value="thai">คำไทยทับศัพท์ง่าย</option></select>
+</div>
+<div class="field"><label>ชื่อผู้เล่น</label>
+<input class="nav-btn" id="studentName" readonly="" style="min-width:280px"/>
+</div>
+<div class="field"><label>เกณฑ์: คะแนน ≥ / Accuracy ≥</label>
+<div class="row">
+<input class="nav-btn" id="minScore" style="width:90px" type="number" value="25"/>
+<input class="nav-btn" id="minAcc" style="width:90px" type="number" value="85"/>
+</div>
+</div>
+<div class="field" id="wrapWordInput" style="display:none"><label>พิมพ์คำ (โหมดคำ)</label>
+<input class="nav-btn" id="wordInputFS" placeholder="พิมพ์คำแล้วกด Enter" style="min-width:260px"/>
+</div>
+</div>
+<div class="panel pad">
+<div class="kbd" id="kbd"></div>
+</div>
+</div>
+</section>
+<!-- RESULTS PAGE -->
+<section class="section hidden" id="route-results">
+<h2 class="h2"> >สรุปผล/รายชื่อ</h2>
+<div class="row gap">
+<button class="btn" id="btnExportStudents"><i class="fa-solid fa-download"></i> ส่งออกรายชื่อ (Excel)</button>
+<button class="btn" id="btnExportResults"><i class="fa-solid fa-download"></i> ส่งออกผลเล่นเกม (Excel)</button>
+<button class="btn warn" id="btnClearStudents"><i class="fa-regular fa-trash-can"></i> ลบรายชื่อทั้งหมด</button>
+<button class="btn warn" id="btnClearResults"><i class="fa-regular fa-trash-can"></i> ลบผลทั้งหมด</button>
+</div>
+<div class="tiles">
+<div class="tile big">
+<div class="title">รายชื่อผู้ใช้งาน</div>
+<table>
+<thead><tr><th>ชื่อ-สกุล</th><th>ชั้น</th><th>เลขที่</th><th>เวลา</th></tr></thead>
+<tbody id="tblStudents"></tbody>
+</table>
+</div>
+<div class="tile big">
+<div class="title">ผลการเล่น</div>
+<table>
+<thead><tr><th>เวลา</th><th>ชื่อ</th><th>โหมด</th><th>คะแนน</th><th>พลาด</th><th>Acc</th><th>WPM</th><th>ผ่าน</th></tr></thead>
+<tbody id="tblResults"></tbody>
+</table>
+</div>
+</div>
+</section>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
